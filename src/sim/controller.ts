@@ -3,7 +3,7 @@
  * Computes angle commands based on position/velocity error
  */
 
-import { clamp, RateLimiter, deg2rad } from '../utils/math';
+import { clamp, RateLimiter } from '../utils/math';
 import { PHYSICS_CONSTANTS } from './physics';
 
 /**

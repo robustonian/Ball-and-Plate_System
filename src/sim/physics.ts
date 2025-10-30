@@ -149,28 +149,23 @@ export function handleBoundaryCollision(state: SimulationState): SimulationState
   const limit = halfSize - margin;
 
   let { x, y, vx, vy } = state;
-  let collision = false;
 
   // X boundaries
   if (x < -limit) {
     x = -limit;
     vx = -vx * PHYSICS_CONSTANTS.boundaryRestitution;
-    collision = true;
   } else if (x > limit) {
     x = limit;
     vx = -vx * PHYSICS_CONSTANTS.boundaryRestitution;
-    collision = true;
   }
 
   // Y boundaries
   if (y < -limit) {
     y = -limit;
     vy = -vy * PHYSICS_CONSTANTS.boundaryRestitution;
-    collision = true;
   } else if (y > limit) {
     y = limit;
     vy = -vy * PHYSICS_CONSTANTS.boundaryRestitution;
-    collision = true;
   }
 
   return { ...state, x, y, vx, vy };

@@ -169,7 +169,9 @@ const ControlPanel: React.FC = () => {
               <label className="block text-sm font-semibold mb-2">Control Mode</label>
               <select
                 value={controlMode}
-                onChange={(e) => setControlMode(e.target.value as any)}
+                onChange={(e) =>
+                  setControlMode(e.target.value as 'stabilization' | 'mouse' | 'drawing' | 'manual')
+                }
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
               >
                 <option value="stabilization">Stabilization (Origin)</option>

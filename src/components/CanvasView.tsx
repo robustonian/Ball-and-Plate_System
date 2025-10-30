@@ -14,7 +14,6 @@ const CanvasView: React.FC = () => {
   const trajectory = useStore((state) => state.trajectory);
   const currentReference = useStore((state) => state.currentReference);
   const waitingForInitClick = useStore((state) => state.waitingForInitClick);
-  const mousePhysicalPos = useStore((state) => state.mousePhysicalPos);
   const controlMode = useStore((state) => state.referenceManager.getMode());
   const drawingPath = useStore((state) => state.drawingPath);
   const isDrawing = useStore((state) => state.isDrawing);

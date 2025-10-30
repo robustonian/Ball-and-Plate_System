@@ -83,13 +83,14 @@ const App: React.FC = () => {
           startInitPositionMode();
           break;
 
-        case 'KeyM':
+        case 'KeyM': {
           // Cycle through modes
           const modes = ['stabilization', 'mouse', 'drawing', 'manual'] as const;
           const currentIndex = modes.indexOf(controlMode);
           const nextMode = modes[(currentIndex + 1) % modes.length];
           setControlMode(nextMode);
           break;
+        }
 
         case 'ArrowUp':
           // Tilt forward (negative theta)

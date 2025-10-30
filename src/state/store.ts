@@ -10,7 +10,6 @@ import {
   createDefaultPhysicsParams,
   rk4Step,
   handleBoundaryCollision,
-  PHYSICS_CONSTANTS,
 } from '../sim/physics';
 import {
   ControllerConfig,
@@ -25,7 +24,7 @@ import {
   GAIN_PRESETS,
 } from '../sim/controller';
 import { ReferenceManager, ControlMode } from '../sim/reference';
-import { deg2rad, rad2deg } from '../utils/math';
+import { deg2rad } from '../utils/math';
 
 /**
  * Trajectory point for trail rendering
@@ -216,7 +215,7 @@ export const useStore = create<AppState>((set, get) => ({
     const dt = scaledDelta / numSubsteps;
 
     let currentState = state.simState;
-    let currentControllerState = state.controllerState;
+    const currentControllerState = state.controllerState;
 
     // Get reference for this timestep
     const reference = state.referenceManager.getReference(currentState.time, dt);
