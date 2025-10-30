@@ -1,0 +1,130 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1f2937;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111827;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="plateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4b5563;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6b7280;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="ballGradient" cx="35%" cy="35%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Grid pattern -->
+  <g stroke="#374151" stroke-width="1" opacity="0.3">
+    <line x1="0" y1="0" x2="1200" y2="0" stroke-dasharray="5,5"/>
+    <line x1="0" y1="630" x2="1200" y2="630" stroke-dasharray="5,5"/>
+    <line x1="0" y1="0" x2="0" y2="630" stroke-dasharray="5,5"/>
+    <line x1="1200" y1="0" x2="1200" y2="630" stroke-dasharray="5,5"/>
+    <!-- Horizontal lines -->
+    <line x1="0" y1="157" x2="1200" y2="157" stroke-dasharray="5,5"/>
+    <line x1="0" y1="315" x2="1200" y2="315" stroke-dasharray="5,5"/>
+    <line x1="0" y1="472" x2="1200" y2="472" stroke-dasharray="5,5"/>
+    <!-- Vertical lines -->
+    <line x1="300" y1="0" x2="300" y2="630" stroke-dasharray="5,5"/>
+    <line x1="600" y1="0" x2="600" y2="630" stroke-dasharray="5,5"/>
+    <line x1="900" y1="0" x2="900" y2="630" stroke-dasharray="5,5"/>
+  </g>
+
+  <!-- Plate -->
+  <g transform="translate(350, 315)">
+    <!-- Plate shadow -->
+    <rect x="-130" y="-130" width="260" height="260" fill="rgba(0,0,0,0.3)" transform="translate(10, 10)"/>
+
+    <!-- Plate surface -->
+    <rect x="-140" y="-140" width="280" height="280" fill="url(#plateGradient)" stroke="#9ca3af" stroke-width="3"/>
+
+    <!-- Grid on plate -->
+    <g stroke="#374151" stroke-width="1">
+      <line x1="-140" y1="-105" x2="140" y2="-105"/>
+      <line x1="-140" y1="-70" x2="140" y2="-70"/>
+      <line x1="-140" y1="-35" x2="140" y2="-35"/>
+      <line x1="-140" y1="0" x2="140" y2="0"/>
+      <line x1="-140" y1="35" x2="140" y2="35"/>
+      <line x1="-140" y1="70" x2="140" y2="70"/>
+      <line x1="-140" y1="105" x2="140" y2="105"/>
+
+      <line x1="-105" y1="-140" x2="-105" y2="140"/>
+      <line x1="-70" y1="-140" x2="-70" y2="140"/>
+      <line x1="-35" y1="-140" x2="-35" y2="140"/>
+      <line x1="0" y1="-140" x2="0" y2="140"/>
+      <line x1="35" y1="-140" x2="35" y2="140"/>
+      <line x1="70" y1="-140" x2="70" y2="140"/>
+      <line x1="105" y1="-140" x2="105" y2="140"/>
+    </g>
+
+    <!-- Center crosshair -->
+    <g stroke="#10b981" stroke-width="2">
+      <line x1="-20" y1="0" x2="20" y2="0"/>
+      <line x1="0" y1="-20" x2="0" y2="20"/>
+    </g>
+
+    <!-- Trajectory trail -->
+    <path d="M -80 80 L -60 50 L -40 30 L -20 10 L 0 0 L 20 -20 L 40 -50"
+          stroke="#3b82f6" stroke-width="3" fill="none" opacity="0.6" stroke-linecap="round"/>
+
+    <!-- Ball shadow -->
+    <ellipse cx="45" cy="-45" rx="16" ry="8" fill="rgba(0,0,0,0.4)"/>
+
+    <!-- Ball -->
+    <circle cx="40" cy="-50" r="18" fill="url(#ballGradient)"/>
+
+    <!-- Ball highlight -->
+    <circle cx="34" cy="-56" r="6" fill="rgba(255,255,255,0.4)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="700" y="180" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="#ffffff">
+    Ball &amp; Plate System
+  </text>
+
+  <!-- Subtitle -->
+  <text x="700" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="36" fill="#9ca3af">
+    Interactive Control Theory Simulator
+  </text>
+
+  <!-- Features -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="bold" fill="#60a5fa">
+    <text x="700" y="320">✓ PD Controller with Feedforward</text>
+    <text x="700" y="370">✓ Real-time Physics Simulation</text>
+    <text x="700" y="420">✓ Multiple Tracking Modes</text>
+    <text x="700" y="470">✓ Interactive Visualization</text>
+  </g>
+
+  <!-- Tech stack badges -->
+  <g transform="translate(700, 540)">
+    <!-- TypeScript -->
+    <rect x="0" y="0" width="130" height="40" fill="#374151" rx="4"/>
+    <text x="15" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="bold" fill="#60a5fa">TypeScript</text>
+
+    <!-- React -->
+    <rect x="145" y="0" width="85" height="40" fill="#374151" rx="4"/>
+    <text x="160" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="bold" fill="#60a5fa">React</text>
+
+    <!-- Vite -->
+    <rect x="245" y="0" width="70" height="40" fill="#374151" rx="4"/>
+    <text x="260" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="bold" fill="#60a5fa">Vite</text>
+
+    <!-- Tailwind -->
+    <rect x="330" y="0" width="105" height="40" fill="#374151" rx="4"/>
+    <text x="345" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="bold" fill="#60a5fa">Tailwind</text>
+  </g>
+
+  <!-- Decorative corner accents -->
+  <g stroke="#3b82f6" stroke-width="3" fill="none">
+    <!-- Top left -->
+    <path d="M 50 100 L 50 50 L 100 50"/>
+    <!-- Bottom right -->
+    <path d="M 1150 530 L 1150 580 L 1100 580"/>
+  </g>
+</svg>

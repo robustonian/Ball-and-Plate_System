@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OG Image Generator - Ball & Plate System</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1f2937;
+    }
+    #canvas {
+      border: 2px solid #374151;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .info {
+      color: #9ca3af;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="1200" height="630"></canvas>
+  <br>
+  <button onclick="downloadImage()">Download OG Image</button>
+  <div class="info">
+    Right-click on the canvas and "Save image as..." to save as og-image.png<br>
+    Place the saved image in the public/ folder
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Background gradient
+    const bgGradient = ctx.createLinearGradient(0, 0, 1200, 630);
+    bgGradient.addColorStop(0, '#1f2937');
+    bgGradient.addColorStop(1, '#111827');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, 1200, 630);
+
+    // Grid pattern
+    ctx.strokeStyle = '#374151';
+    ctx.lineWidth = 1;
+    const gridSize = 30;
+    for (let x = 0; x <= 1200; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 630);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= 630; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(1200, y);
+      ctx.stroke();
+    }
+
+    // Draw plate (3D perspective)
+    const plateCenterX = 350;
+    const plateCenterY = 315;
+    const plateSize = 280;
+    const tiltAngle = 0.15;
+
+    ctx.save();
+    ctx.translate(plateCenterX, plateCenterY);
+
+    // Plate shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.fillRect(-plateSize/2 + 10, -plateSize/2 + 10, plateSize, plateSize);
+
+    // Plate with gradient
+    const plateGradient = ctx.createLinearGradient(-plateSize/2, -plateSize/2, plateSize/2, plateSize/2);
+    plateGradient.addColorStop(0, '#4b5563');
+    plateGradient.addColorStop(1, '#6b7280');
+    ctx.fillStyle = plateGradient;
+    ctx.strokeStyle = '#9ca3af';
+    ctx.lineWidth = 3;
+    ctx.fillRect(-plateSize/2, -plateSize/2, plateSize, plateSize);
+    ctx.strokeRect(-plateSize/2, -plateSize/2, plateSize, plateSize);
+
+    // Grid lines on plate
+    ctx.strokeStyle = '#374151';
+    ctx.lineWidth = 1;
+    const plateGridSize = plateSize / 8;
+    for (let i = 1; i < 8; i++) {
+      ctx.beginPath();
+      ctx.moveTo(-plateSize/2 + i * plateGridSize, -plateSize/2);
+      ctx.lineTo(-plateSize/2 + i * plateGridSize, plateSize/2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(-plateSize/2, -plateSize/2 + i * plateGridSize);
+      ctx.lineTo(plateSize/2, -plateSize/2 + i * plateGridSize);
+      ctx.stroke();
+    }
+
+    // Center cross
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-20, 0);
+    ctx.lineTo(20, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, -20);
+    ctx.lineTo(0, 20);
+    ctx.stroke();
+
+    // Ball with gradient and shadow
+    const ballX = 40;
+    const ballY = -50;
+    const ballRadius = 18;
+
+    // Ball shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.beginPath();
+    ctx.ellipse(ballX + 5, ballY + 5, ballRadius - 2, ballRadius / 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ball
+    const ballGradient = ctx.createRadialGradient(ballX - 6, ballY - 6, 2, ballX, ballY, ballRadius);
+    ballGradient.addColorStop(0, '#fbbf24');
+    ballGradient.addColorStop(1, '#f59e0b');
+    ctx.fillStyle = ballGradient;
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ball highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.beginPath();
+    ctx.arc(ballX - 6, ballY - 6, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Trajectory trail
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.6)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    const trailPoints = [
+      [-80, 80], [-60, 50], [-40, 30], [-20, 10], [0, 0], [20, -20], [40, -50]
+    ];
+    ctx.moveTo(trailPoints[0][0], trailPoints[0][1]);
+    for (let i = 1; i < trailPoints.length; i++) {
+      ctx.lineTo(trailPoints[i][0], trailPoints[i][1]);
+    }
+    ctx.stroke();
+
+    ctx.restore();
+
+    // Title
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 72px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText('Ball & Plate System', 700, 200);
+
+    // Subtitle
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText('Interactive Control Theory Simulator', 700, 260);
+
+    // Features
+    ctx.fillStyle = '#60a5fa';
+    ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    const features = [
+      '✓ PD Controller with Feedforward',
+      '✓ Real-time Physics Simulation',
+      '✓ Multiple Tracking Modes',
+      '✓ Interactive Visualization'
+    ];
+
+    features.forEach((feature, index) => {
+      ctx.fillText(feature, 700, 340 + index * 50);
+    });
+
+    // Tech stack badges
+    const badges = ['TypeScript', 'React', 'Vite', 'Tailwind'];
+    ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    let badgeX = 700;
+    badges.forEach(badge => {
+      const width = ctx.measureText(badge).width + 30;
+
+      // Badge background
+      ctx.fillStyle = '#374151';
+      ctx.fillRect(badgeX, 560, width, 40);
+
+      // Badge text
+      ctx.fillStyle = '#60a5fa';
+      ctx.fillText(badge, badgeX + 15, 586);
+
+      badgeX += width + 15;
+    });
+
+    // Decorative elements
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 3;
+
+    // Corner accents
+    ctx.beginPath();
+    ctx.moveTo(50, 50);
+    ctx.lineTo(50, 100);
+    ctx.moveTo(50, 50);
+    ctx.lineTo(100, 50);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(1150, 580);
+    ctx.lineTo(1150, 530);
+    ctx.moveTo(1150, 580);
+    ctx.lineTo(1100, 580);
+    ctx.stroke();
+
+    function downloadImage() {
+      const link = document.createElement('a');
+      link.download = 'og-image.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
