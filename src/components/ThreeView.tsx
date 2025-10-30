@@ -54,8 +54,10 @@ const Ball: React.FC<{ x: number; y: number; theta: number; phi: number }> = ({ 
   const ballRadius = PHYSICS_CONSTANTS.ballRadius;
 
   // Calculate ball height on tilted plate
-  // z = ballRadius (base height) + height variation due to plate tilt
-  const z = ballRadius + x * Math.sin(theta) + y * Math.sin(phi);
+  // z = ballRadius (base height) - height variation due to plate tilt
+  // Negative signs because: rotation.x = -phi and rotation.y = theta
+  // create downward slopes in positive x and y directions
+  const z = ballRadius - x * Math.sin(theta) - y * Math.sin(phi);
 
   return (
     <mesh castShadow position={[x, y, z]}>
