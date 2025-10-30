@@ -26,6 +26,14 @@ This application simulates a ball rolling on a tilting plate, controlled by a PD
 3. **Drawing Path Mode**: Draw a custom path for the ball to follow
 4. **Manual Control Mode**: Direct control using arrow keys
 
+### Real-Time Angle Visualization
+
+- **Angle Chart**: Live time-series plot showing θ (red), φ (blue), and tracking error (green)
+- Displays control behavior including overshoot, settling time, and oscillations
+- Configurable history window (5-30 seconds)
+- Saturation limits clearly marked for performance analysis
+- Essential tool for understanding PD controller behavior and tuning
+
 ### Physics Model
 
 The system models a solid sphere rolling on a tilted plate:
@@ -142,6 +150,8 @@ npm run preview
 #### Display Tab
 
 - **Trail Length**: Number of trajectory points to display (0-1000)
+- **Show Angle Chart**: Toggle real-time angle visualization
+- **Chart History**: Time window for angle chart (5-30 seconds)
 
 ### Drawing Mode
 
@@ -213,6 +223,7 @@ Ball-and-Plate_System/
 │   │   └── store.ts            # Zustand state management
 │   ├── components/
 │   │   ├── CanvasView.tsx      # Canvas rendering component
+│   │   ├── ChartView.tsx       # Angle chart visualization
 │   │   └── ControlPanel.tsx    # UI controls
 │   ├── utils/
 │   │   └── math.ts             # Math utilities (filters, splines)

@@ -36,6 +36,16 @@ interface TrajectoryPoint {
 }
 
 /**
+ * Angle history point for chart rendering
+ */
+interface AngleHistoryPoint {
+  time: number;
+  theta: number; // rad
+  phi: number; // rad
+  error: number; // m
+}
+
+/**
  * Application state
  */
 interface AppState {
@@ -67,6 +77,11 @@ interface AppState {
   trajectory: TrajectoryPoint[];
   maxTrailLength: number;
 
+  // Angle history for chart
+  angleHistory: AngleHistoryPoint[];
+  maxAngleHistorySeconds: number;
+  showAngleChart: boolean;
+
   // UI state
   waitingForInitClick: boolean;
   mousePhysicalPos: { x: number; y: number } | null;
@@ -93,6 +108,8 @@ interface AppState {
   setEnableDrag: (enable: boolean) => void;
   setDragCoefficient: (coeff: number) => void;
   setMaxTrailLength: (length: number) => void;
+  setMaxAngleHistorySeconds: (seconds: number) => void;
+  setShowAngleChart: (show: boolean) => void;
   setManualInput: (theta: number, phi: number) => void;
   addManualInput: (dTheta: number, dPhi: number) => void;
   startDrawing: () => void;
@@ -143,6 +160,9 @@ export const useStore = create<AppState>((set, get) => ({
   lastUpdateTime: 0,
   trajectory: [],
   maxTrailLength: 500,
+  angleHistory: [],
+  maxAngleHistorySeconds: 10,
+  showAngleChart: true,
   waitingForInitClick: false,
   mousePhysicalPos: null,
   drawingPath: [],
@@ -158,6 +178,7 @@ export const useStore = create<AppState>((set, get) => ({
     set({
       simState: newSimState,
       trajectory: [],
+      angleHistory: [],
       thetaCmd: 0,
       phiCmd: 0,
       manualTheta: 0,
@@ -187,6 +208,7 @@ export const useStore = create<AppState>((set, get) => ({
     set({
       simState: newSimState,
       trajectory: [{ x, y, time: 0 }],
+      angleHistory: [],
       waitingForInitClick: false,
       thetaCmd: 0,
       phiCmd: 0,
@@ -262,9 +284,28 @@ export const useStore = create<AppState>((set, get) => ({
         ? newTrajectory.slice(-state.maxTrailLength)
         : newTrajectory;
 
+    // Update angle history
+    const errorMagnitude = Math.sqrt(
+      Math.pow(currentState.x - reference.x, 2) + Math.pow(currentState.y - reference.y, 2)
+    );
+    const newAngleHistory = [
+      ...state.angleHistory,
+      {
+        time: currentState.time,
+        theta: currentControllerState.theta,
+        phi: currentControllerState.phi,
+        error: errorMagnitude,
+      },
+    ];
+
+    // Trim angle history to time window
+    const cutoffTime = currentState.time - state.maxAngleHistorySeconds;
+    const trimmedAngleHistory = newAngleHistory.filter((point) => point.time >= cutoffTime);
+
     set({
       simState: currentState,
       trajectory: trimmedTrajectory,
+      angleHistory: trimmedAngleHistory,
       currentReference: reference,
       thetaCmd: currentControllerState.theta,
       phiCmd: currentControllerState.phi,
@@ -364,6 +405,14 @@ export const useStore = create<AppState>((set, get) => ({
 
   setMaxTrailLength: (length: number) => {
     set({ maxTrailLength: length });
+  },
+
+  setMaxAngleHistorySeconds: (seconds: number) => {
+    set({ maxAngleHistorySeconds: seconds });
+  },
+
+  setShowAngleChart: (show: boolean) => {
+    set({ showAngleChart: show });
   },
 
   setManualInput: (theta: number, phi: number) => {

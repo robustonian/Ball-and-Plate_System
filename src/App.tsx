@@ -5,6 +5,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import CanvasView from './components/CanvasView';
+import ChartView from './components/ChartView';
 import ControlPanel from './components/ControlPanel';
 import { useStore } from './state/store';
 import { deg2rad } from './utils/math';
@@ -22,6 +23,7 @@ const App: React.FC = () => {
   const controlMode = useStore((state) => state.referenceManager.getMode());
   const addManualInput = useStore((state) => state.addManualInput);
   const manualRateDegPerSec = useStore((state) => state.manualRateDegPerSec);
+  const showAngleChart = useStore((state) => state.showAngleChart);
 
   /**
    * Animation loop
@@ -211,11 +213,21 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen w-screen bg-gray-900 text-white">
-      {/* Canvas View */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full h-full max-w-4xl max-h-4xl bg-gray-800 rounded-lg overflow-hidden shadow-2xl">
-          <CanvasView />
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col p-4 gap-4">
+        {/* Canvas View */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full h-full max-w-4xl max-h-[600px] bg-gray-800 rounded-lg overflow-hidden shadow-2xl">
+            <CanvasView />
+          </div>
         </div>
+
+        {/* Angle Chart */}
+        {showAngleChart && (
+          <div className="w-full bg-gray-800 rounded-lg overflow-hidden shadow-2xl" style={{ height: '180px' }}>
+            <ChartView />
+          </div>
+        )}
       </div>
 
       {/* Control Panel */}

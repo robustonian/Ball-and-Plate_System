@@ -21,6 +21,8 @@ const ControlPanel: React.FC = () => {
   const controllerConfig = useStore((state) => state.controllerConfig);
   const physicsParams = useStore((state) => state.physicsParams);
   const maxTrailLength = useStore((state) => state.maxTrailLength);
+  const showAngleChart = useStore((state) => state.showAngleChart);
+  const maxAngleHistorySeconds = useStore((state) => state.maxAngleHistorySeconds);
   const controlMode = useStore((state) => state.referenceManager.getMode());
   const referenceManager = useStore((state) => state.referenceManager);
 
@@ -39,6 +41,8 @@ const ControlPanel: React.FC = () => {
   const setEnableDrag = useStore((state) => state.setEnableDrag);
   const setDragCoefficient = useStore((state) => state.setDragCoefficient);
   const setMaxTrailLength = useStore((state) => state.setMaxTrailLength);
+  const setShowAngleChart = useStore((state) => state.setShowAngleChart);
+  const setMaxAngleHistorySeconds = useStore((state) => state.setMaxAngleHistorySeconds);
   const startDrawing = useStore((state) => state.startDrawing);
   const finishDrawing = useStore((state) => state.finishDrawing);
   const cancelDrawing = useStore((state) => state.cancelDrawing);
@@ -495,9 +499,41 @@ const ControlPanel: React.FC = () => {
               />
             </div>
 
+            {/* Angle Chart Settings */}
+            <div className="space-y-3 pt-2 border-t border-gray-700">
+              <h3 className="text-sm font-semibold">Angle Chart</h3>
+
+              <label className="flex items-center text-sm">
+                <input
+                  type="checkbox"
+                  checked={showAngleChart}
+                  onChange={(e) => setShowAngleChart(e.target.checked)}
+                  className="mr-2"
+                />
+                Show Angle Chart
+              </label>
+
+              {showAngleChart && (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">
+                    Chart History (seconds): {maxAngleHistorySeconds}
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="30"
+                    step="1"
+                    value={maxAngleHistorySeconds}
+                    onChange={(e) => setMaxAngleHistorySeconds(parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </div>
+
             {/* Info */}
             <div className="text-xs text-gray-400 space-y-1">
-              <p>Adjust visual settings and display preferences</p>
+              <p>Angle chart shows θ (red), φ (blue), and error (green) over time</p>
             </div>
           </div>
         )}
