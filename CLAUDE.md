@@ -94,6 +94,8 @@ Four control modes coordinated by `ReferenceManager`:
 - **ChartView.tsx**: Real-time angle chart showing θ, φ, and error over time with grid, saturation lines, and legend
 - **ThreeView.tsx**: Interactive 3D visualization using Three.js with React Three Fiber
   - Plate geometry with tilt based on θ and φ angles
+    - Rotation mapping: `rotation.x = -phi`, `rotation.y = theta`
+    - Negative phi ensures correct tilt direction (phi > 0 tilts plate down in +Y)
   - Ball with metallic material and shadows
   - 3D trajectory line following ball path
   - OrbitControls for camera manipulation

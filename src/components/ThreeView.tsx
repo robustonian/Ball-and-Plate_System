@@ -18,9 +18,11 @@ const Plate: React.FC<{ theta: number; phi: number }> = ({ theta, phi }) => {
 
   useFrame(() => {
     if (meshRef.current) {
-      // Apply rotations: phi around X, theta around Z (negative for correct direction)
-      meshRef.current.rotation.x = phi;
-      meshRef.current.rotation.z = -theta;
+      // Apply rotations to match physics:
+      // phi > 0: ball rolls +Y → plate tilts down in +Y → rotation.x < 0
+      // theta > 0: ball rolls +X → plate tilts down in +X → rotation.y > 0
+      meshRef.current.rotation.x = -phi;
+      meshRef.current.rotation.y = theta;
     }
   });
 
