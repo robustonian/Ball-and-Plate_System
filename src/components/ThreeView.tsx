@@ -165,8 +165,8 @@ const ThreeView: React.FC = () => {
     <div className="w-full h-full bg-gray-900 rounded-lg overflow-hidden">
       <Canvas
         camera={{
-          position: [0.6, -0.6, 0.6],
-          fov: 50,
+          position: [0., -0.6, 0.3],
+          fov: 65,
         }}
         shadows
         gl={{ antialias: true }}
