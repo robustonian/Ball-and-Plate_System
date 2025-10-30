@@ -92,6 +92,13 @@ Four control modes coordinated by `ReferenceManager`:
 ### React Components
 - **CanvasView.tsx**: Renders simulation state using Canvas 2D API with high-DPI support
 - **ChartView.tsx**: Real-time angle chart showing θ, φ, and error over time with grid, saturation lines, and legend
+- **ThreeView.tsx**: Interactive 3D visualization using Three.js with React Three Fiber
+  - Plate geometry with tilt based on θ and φ angles
+  - Ball with metallic material and shadows
+  - 3D trajectory line following ball path
+  - OrbitControls for camera manipulation
+  - Grid helper and coordinate axes
+  - Directional/ambient/point lighting
 - **ControlPanel.tsx**: UI for adjusting gains, modes, physics parameters, and display settings
 - **App.tsx**: Top-level component managing animation loop and keyboard input
 
@@ -147,3 +154,5 @@ Four control modes coordinated by `ReferenceManager`:
 - Mouse mode demonstrates tracking with velocity/acceleration estimation
 - Use angle chart (Display tab) to observe overshoot, settling time, and oscillations
 - Chart shows θ (red), φ (blue), and tracking error (green) with saturation limits marked
+- Use 3D view (Display tab) to visualize plate tilt and ball motion in 3D space
+- Drag to rotate camera, scroll to zoom in 3D view

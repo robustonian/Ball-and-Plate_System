@@ -6,6 +6,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import CanvasView from './components/CanvasView';
 import ChartView from './components/ChartView';
+import ThreeView from './components/ThreeView';
 import ControlPanel from './components/ControlPanel';
 import { useStore } from './state/store';
 import { deg2rad } from './utils/math';
@@ -24,6 +25,8 @@ const App: React.FC = () => {
   const addManualInput = useStore((state) => state.addManualInput);
   const manualRateDegPerSec = useStore((state) => state.manualRateDegPerSec);
   const showAngleChart = useStore((state) => state.showAngleChart);
+  const showThreeView = useStore((state) => state.showThreeView);
+  const threeViewSize = useStore((state) => state.threeViewSize);
 
   /**
    * Animation loop
@@ -212,7 +215,7 @@ const App: React.FC = () => {
   }, [handleKeyDown]);
 
   return (
-    <div className="flex h-screen w-screen bg-gray-900 text-white">
+    <div className="flex h-screen w-screen bg-gray-900 text-white relative">
       {/* Main content area */}
       <div className="flex-1 flex flex-col p-4 gap-4">
         {/* Canvas View */}
@@ -229,6 +232,25 @@ const App: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* 3D View - Floating Window */}
+      {showThreeView && (
+        <div
+          className="absolute top-4 right-[25rem] bg-gray-800 border-2 border-gray-700 rounded-lg shadow-2xl overflow-hidden"
+          style={{
+            width: `${threeViewSize}px`,
+            height: `${threeViewSize}px`,
+          }}
+        >
+          <div className="relative w-full h-full">
+            <ThreeView />
+            {/* Label */}
+            <div className="absolute top-2 left-2 bg-gray-900 bg-opacity-80 px-2 py-1 rounded text-xs font-semibold text-gray-300 pointer-events-none">
+              3D View
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Control Panel */}
       <div className="w-96 flex-shrink-0 border-l border-gray-700 shadow-xl">
