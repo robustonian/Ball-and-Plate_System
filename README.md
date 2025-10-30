@@ -113,11 +113,11 @@ npm run preview
 - **R**: Reset to initial state (origin)
 - **I**: Enter "Set Initial Position" mode (click on canvas to place ball)
 - **M**: Cycle through control modes
-- **Arrow Keys**: Manual control (tilt the plate directly)
-  - ↑: Tilt forward (negative θ)
-  - ↓: Tilt backward (positive θ)
-  - ←: Tilt left (negative φ)
-  - →: Tilt right (positive φ)
+- **Arrow Keys**: Manual control (move the ball directly)
+  - ↑: Move ball up (positive φ)
+  - ↓: Move ball down (negative φ)
+  - ←: Move ball left (negative θ)
+  - →: Move ball right (positive θ)
 
 ### Control Panel
 
