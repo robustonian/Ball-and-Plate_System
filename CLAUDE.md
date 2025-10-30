@@ -81,6 +81,7 @@ Four control modes coordinated by `ReferenceManager`:
    - Parametric trajectory with adjustable duration and loop mode
    - Evaluates position/velocity/acceleration along spline with chain rule scaling
 4. **Manual**: No automatic reference, user directly controls plate angles via arrow keys
+   - Arrow keys map intuitively: ↑ moves ball up (positive φ), → moves ball right (positive θ)
 
 ### Math Utilities (utils/math.ts)
 - **LowPassFilter**: First-order IIR filter for smoothing

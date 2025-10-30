@@ -93,34 +93,34 @@ const App: React.FC = () => {
         }
 
         case 'ArrowUp':
-          // Tilt forward (negative theta)
+          // Move ball up (positive phi)
           if (!event.repeat) {
-            const deltaTheta = -deg2rad(manualRateDegPerSec * 0.05); // 50ms step
-            addManualInput(deltaTheta, 0);
+            const deltaPhi = deg2rad(manualRateDegPerSec * 0.05); // 50ms step
+            addManualInput(0, deltaPhi);
           }
           break;
 
         case 'ArrowDown':
-          // Tilt backward (positive theta)
-          if (!event.repeat) {
-            const deltaTheta = deg2rad(manualRateDegPerSec * 0.05);
-            addManualInput(deltaTheta, 0);
-          }
-          break;
-
-        case 'ArrowLeft':
-          // Tilt left (negative phi)
+          // Move ball down (negative phi)
           if (!event.repeat) {
             const deltaPhi = -deg2rad(manualRateDegPerSec * 0.05);
             addManualInput(0, deltaPhi);
           }
           break;
 
-        case 'ArrowRight':
-          // Tilt right (positive phi)
+        case 'ArrowLeft':
+          // Move ball left (negative theta)
           if (!event.repeat) {
-            const deltaPhi = deg2rad(manualRateDegPerSec * 0.05);
-            addManualInput(0, deltaPhi);
+            const deltaTheta = -deg2rad(manualRateDegPerSec * 0.05);
+            addManualInput(deltaTheta, 0);
+          }
+          break;
+
+        case 'ArrowRight':
+          // Move ball right (positive theta)
+          if (!event.repeat) {
+            const deltaTheta = deg2rad(manualRateDegPerSec * 0.05);
+            addManualInput(deltaTheta, 0);
           }
           break;
       }
@@ -155,16 +155,16 @@ const App: React.FC = () => {
             let deltaPhi = 0;
 
             if (pressedKeys.has('ArrowUp')) {
-              deltaTheta -= deg2rad(manualRateDegPerSec * deltaTime);
+              deltaPhi += deg2rad(manualRateDegPerSec * deltaTime);
             }
             if (pressedKeys.has('ArrowDown')) {
-              deltaTheta += deg2rad(manualRateDegPerSec * deltaTime);
-            }
-            if (pressedKeys.has('ArrowLeft')) {
               deltaPhi -= deg2rad(manualRateDegPerSec * deltaTime);
             }
+            if (pressedKeys.has('ArrowLeft')) {
+              deltaTheta -= deg2rad(manualRateDegPerSec * deltaTime);
+            }
             if (pressedKeys.has('ArrowRight')) {
-              deltaPhi += deg2rad(manualRateDegPerSec * deltaTime);
+              deltaTheta += deg2rad(manualRateDegPerSec * deltaTime);
             }
 
             if (deltaTheta !== 0 || deltaPhi !== 0) {
