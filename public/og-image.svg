@@ -84,25 +84,25 @@
   </g>
 
   <!-- Title -->
-  <text x="700" y="180" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="#ffffff">
+  <text x="620" y="180" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="bold" fill="#ffffff">
     Ball &amp; Plate System
   </text>
 
   <!-- Subtitle -->
-  <text x="700" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="36" fill="#9ca3af">
+  <text x="620" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="30" fill="#9ca3af">
     Interactive Control Theory Simulator
   </text>
 
   <!-- Features -->
-  <g font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="bold" fill="#60a5fa">
-    <text x="700" y="320">✓ PD Controller with Feedforward</text>
-    <text x="700" y="370">✓ Real-time Physics Simulation</text>
-    <text x="700" y="420">✓ Multiple Tracking Modes</text>
-    <text x="700" y="470">✓ Interactive Visualization</text>
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="bold" fill="#60a5fa">
+    <text x="620" y="300">✓ PD Controller with Feedforward</text>
+    <text x="620" y="350">✓ Real-time Physics Simulation</text>
+    <text x="620" y="400">✓ Multiple Tracking Modes</text>
+    <text x="620" y="450">✓ Interactive Visualization</text>
   </g>
 
   <!-- Tech stack badges -->
-  <g transform="translate(700, 540)">
+  <g transform="translate(620, 520)">
     <!-- TypeScript -->
     <rect x="0" y="0" width="130" height="40" fill="#374151" rx="4"/>
     <text x="15" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="bold" fill="#60a5fa">TypeScript</text>
