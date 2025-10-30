@@ -82,6 +82,10 @@ interface AppState {
   maxAngleHistorySeconds: number;
   showAngleChart: boolean;
 
+  // 3D view settings
+  showThreeView: boolean;
+  threeViewSize: number; // pixels
+
   // UI state
   waitingForInitClick: boolean;
   mousePhysicalPos: { x: number; y: number } | null;
@@ -110,6 +114,8 @@ interface AppState {
   setMaxTrailLength: (length: number) => void;
   setMaxAngleHistorySeconds: (seconds: number) => void;
   setShowAngleChart: (show: boolean) => void;
+  setShowThreeView: (show: boolean) => void;
+  setThreeViewSize: (size: number) => void;
   setManualInput: (theta: number, phi: number) => void;
   addManualInput: (dTheta: number, dPhi: number) => void;
   startDrawing: () => void;
@@ -163,6 +169,8 @@ export const useStore = create<AppState>((set, get) => ({
   angleHistory: [],
   maxAngleHistorySeconds: 10,
   showAngleChart: true,
+  showThreeView: true,
+  threeViewSize: 250,
   waitingForInitClick: false,
   mousePhysicalPos: null,
   drawingPath: [],
@@ -413,6 +421,14 @@ export const useStore = create<AppState>((set, get) => ({
 
   setShowAngleChart: (show: boolean) => {
     set({ showAngleChart: show });
+  },
+
+  setShowThreeView: (show: boolean) => {
+    set({ showThreeView: show });
+  },
+
+  setThreeViewSize: (size: number) => {
+    set({ threeViewSize: size });
   },
 
   setManualInput: (theta: number, phi: number) => {

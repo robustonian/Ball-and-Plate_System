@@ -23,6 +23,8 @@ const ControlPanel: React.FC = () => {
   const maxTrailLength = useStore((state) => state.maxTrailLength);
   const showAngleChart = useStore((state) => state.showAngleChart);
   const maxAngleHistorySeconds = useStore((state) => state.maxAngleHistorySeconds);
+  const showThreeView = useStore((state) => state.showThreeView);
+  const threeViewSize = useStore((state) => state.threeViewSize);
   const controlMode = useStore((state) => state.referenceManager.getMode());
   const referenceManager = useStore((state) => state.referenceManager);
 
@@ -43,6 +45,8 @@ const ControlPanel: React.FC = () => {
   const setMaxTrailLength = useStore((state) => state.setMaxTrailLength);
   const setShowAngleChart = useStore((state) => state.setShowAngleChart);
   const setMaxAngleHistorySeconds = useStore((state) => state.setMaxAngleHistorySeconds);
+  const setShowThreeView = useStore((state) => state.setShowThreeView);
+  const setThreeViewSize = useStore((state) => state.setThreeViewSize);
   const startDrawing = useStore((state) => state.startDrawing);
   const finishDrawing = useStore((state) => state.finishDrawing);
   const cancelDrawing = useStore((state) => state.cancelDrawing);
@@ -531,9 +535,45 @@ const ControlPanel: React.FC = () => {
               )}
             </div>
 
+            {/* 3D View Settings */}
+            <div className="space-y-3 pt-2 border-t border-gray-700">
+              <h3 className="text-sm font-semibold">3D View</h3>
+
+              <label className="flex items-center text-sm">
+                <input
+                  type="checkbox"
+                  checked={showThreeView}
+                  onChange={(e) => setShowThreeView(e.target.checked)}
+                  className="mr-2"
+                />
+                Show 3D View
+              </label>
+
+              {showThreeView && (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">
+                    Window Size (pixels): {threeViewSize}
+                  </label>
+                  <input
+                    type="range"
+                    min="150"
+                    max="400"
+                    step="10"
+                    value={threeViewSize}
+                    onChange={(e) => setThreeViewSize(parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Drag to rotate • Scroll to zoom
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Info */}
             <div className="text-xs text-gray-400 space-y-1">
               <p>Angle chart shows θ (red), φ (blue), and error (green) over time</p>
+              <p>3D view displays plate tilt, ball position, and trajectory in 3D space</p>
             </div>
           </div>
         )}

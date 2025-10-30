@@ -34,6 +34,17 @@ This application simulates a ball rolling on a tilting plate, controlled by a PD
 - Saturation limits clearly marked for performance analysis
 - Essential tool for understanding PD controller behavior and tuning
 
+### 3D Visualization
+
+- **3D View**: Interactive 3D floating window showing plate tilt and ball position
+- Real-time synchronized with simulation
+- Ball accurately follows tilted plate surface (not floating at fixed height)
+- OrbitControls: Drag to rotate camera, scroll to zoom
+- High-quality rendering with shadows, lighting, and anti-aliasing
+- Resizable window (150-400px)
+- Grid and coordinate axes for spatial reference
+- Makes plate tilt angles and 3D motion intuitive to understand
+
 ### Physics Model
 
 The system models a solid sphere rolling on a tilted plate:
@@ -152,6 +163,8 @@ npm run preview
 - **Trail Length**: Number of trajectory points to display (0-1000)
 - **Show Angle Chart**: Toggle real-time angle visualization
 - **Chart History**: Time window for angle chart (5-30 seconds)
+- **Show 3D View**: Toggle 3D floating window
+- **Window Size**: Adjust 3D view size (150-400 pixels)
 
 ### Drawing Mode
 
@@ -224,6 +237,7 @@ Ball-and-Plate_System/
 │   ├── components/
 │   │   ├── CanvasView.tsx      # Canvas rendering component
 │   │   ├── ChartView.tsx       # Angle chart visualization
+│   │   ├── ThreeView.tsx       # 3D visualization with Three.js
 │   │   └── ControlPanel.tsx    # UI controls
 │   ├── utils/
 │   │   └── math.ts             # Math utilities (filters, splines)
@@ -302,11 +316,11 @@ Potential additions:
 - PID control with anti-windup
 - State observer/Kalman filter
 - LQR or MPC controllers
-- 3D visualization with Three.js
 - Noise and disturbance injection
 - Data export (CSV, JSON)
 - Multiple ball simulation
 - Obstacle avoidance
+- VR/AR support for immersive visualization
 
 ## License
 
@@ -334,6 +348,8 @@ Built with modern web technologies:
 - [Vite](https://vitejs.dev/) - Build tool
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [Zustand](https://github.com/pmndrs/zustand) - State management
+- [Three.js](https://threejs.org/) - 3D graphics
+- [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/) - React renderer for Three.js
 
 ---
 
