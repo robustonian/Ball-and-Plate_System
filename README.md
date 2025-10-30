@@ -79,7 +79,7 @@ With:
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/robustonian/Ball-and-Plate_System.git
 cd Ball-and-Plate_System
 ```
 
