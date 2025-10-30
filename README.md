@@ -36,8 +36,9 @@ This application simulates a ball rolling on a tilting plate, controlled by a PD
 
 ### 3D Visualization
 
-- **3D View**: Interactive 3D floating window showing plate tilt, ball position, and trajectory
+- **3D View**: Interactive 3D floating window showing plate tilt and ball position
 - Real-time synchronized with simulation
+- Ball accurately follows tilted plate surface (not floating at fixed height)
 - OrbitControls: Drag to rotate camera, scroll to zoom
 - High-quality rendering with shadows, lighting, and anti-aliasing
 - Resizable window (150-400px)

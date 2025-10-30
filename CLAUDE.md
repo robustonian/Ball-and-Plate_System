@@ -97,10 +97,13 @@ Four control modes coordinated by `ReferenceManager`:
     - Rotation mapping: `rotation.x = -phi`, `rotation.y = theta`
     - Negative phi ensures correct tilt direction (phi > 0 tilts plate down in +Y)
   - Ball with metallic material and shadows
-  - 3D trajectory line following ball path
-  - OrbitControls for camera manipulation
+    - Ball position calculated to follow tilted plate surface
+    - Height formula: `z = ballRadius - x*sin(theta) - y*sin(phi)`
+    - Maintains contact with plate regardless of tilt angle
+  - OrbitControls for camera manipulation (drag to rotate, scroll to zoom)
   - Grid helper and coordinate axes
   - Directional/ambient/point lighting
+  - Note: 3D trajectory currently disabled (doesn't follow plate surface)
 - **ControlPanel.tsx**: UI for adjusting gains, modes, physics parameters, and display settings
 - **App.tsx**: Top-level component managing animation loop and keyboard input
 
