@@ -91,6 +91,7 @@ Four control modes coordinated by `ReferenceManager`:
 
 ### React Components
 - **CanvasView.tsx**: Renders simulation state using Canvas 2D API with high-DPI support
+- **ChartView.tsx**: Real-time angle chart showing θ, φ, and error over time with grid, saturation lines, and legend
 - **ControlPanel.tsx**: UI for adjusting gains, modes, physics parameters, and display settings
 - **App.tsx**: Top-level component managing animation loop and keyboard input
 
@@ -104,7 +105,8 @@ Four control modes coordinated by `ReferenceManager`:
    - Compute control angles via PD controller
    - Integrate dynamics with RK4
    - Handle boundary collisions
-4. Update trajectory trail and store latest state
+4. Update trajectory trail and angle history (time-windowed ring buffer)
+5. Store latest state
 
 ### Controller State
 - Rate limiters maintain previous angle values and enforce slew rate limits
@@ -143,3 +145,5 @@ Four control modes coordinated by `ReferenceManager`:
 - Enable feedforward to improve tracking (especially for drawing mode)
 - Small angle approximation is faster but less accurate at large angles
 - Mouse mode demonstrates tracking with velocity/acceleration estimation
+- Use angle chart (Display tab) to observe overshoot, settling time, and oscillations
+- Chart shows θ (red), φ (blue), and tracking error (green) with saturation limits marked
