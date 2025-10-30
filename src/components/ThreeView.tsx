@@ -3,9 +3,9 @@
  * Provides a 3D visualization with plate tilt, ball position, trajectory, and shadows
  */
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Grid, Line } from '@react-three/drei';
+import { OrbitControls, Grid } from '@react-three/drei';
 import { useStore } from '../state/store';
 import { PHYSICS_CONSTANTS } from '../sim/physics';
 import * as THREE from 'three';
@@ -48,12 +48,17 @@ const Plate: React.FC<{ theta: number; phi: number }> = ({ theta, phi }) => {
 
 /**
  * Ball component - positioned at current simulation state
+ * Ball sits on the tilted plate surface
  */
-const Ball: React.FC<{ x: number; y: number }> = ({ x, y }) => {
+const Ball: React.FC<{ x: number; y: number; theta: number; phi: number }> = ({ x, y, theta, phi }) => {
   const ballRadius = PHYSICS_CONSTANTS.ballRadius;
 
+  // Calculate ball height on tilted plate
+  // z = ballRadius (base height) + height variation due to plate tilt
+  const z = ballRadius + x * Math.sin(theta) + y * Math.sin(phi);
+
   return (
-    <mesh castShadow position={[x, y, ballRadius]}>
+    <mesh castShadow position={[x, y, z]}>
       <sphereGeometry args={[ballRadius, 32, 32]} />
       <meshStandardMaterial
         color="#ef4444"
@@ -66,25 +71,26 @@ const Ball: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 
 /**
  * Trajectory component - 3D line showing ball path
+ * Currently disabled as it doesn't follow plate surface
  */
-const Trajectory: React.FC<{ points: Array<{ x: number; y: number }> }> = ({ points }) => {
-  const linePoints = useMemo(() => {
-    const ballRadius = PHYSICS_CONSTANTS.ballRadius;
-    return points.map(p => new THREE.Vector3(p.x, p.y, ballRadius));
-  }, [points]);
+// const Trajectory: React.FC<{ points: Array<{ x: number; y: number }> }> = ({ points }) => {
+//   const linePoints = useMemo(() => {
+//     const ballRadius = PHYSICS_CONSTANTS.ballRadius;
+//     return points.map(p => new THREE.Vector3(p.x, p.y, ballRadius));
+//   }, [points]);
 
-  if (linePoints.length < 2) return null;
+//   if (linePoints.length < 2) return null;
 
-  return (
-    <Line
-      points={linePoints}
-      color="#3b82f6"
-      lineWidth={2}
-      transparent
-      opacity={0.6}
-    />
-  );
-};
+//   return (
+//     <Line
+//       points={linePoints}
+//       color="#3b82f6"
+//       lineWidth={2}
+//       transparent
+//       opacity={0.6}
+//     />
+//   );
+// };
 
 /**
  * Scene setup with lighting and helpers
@@ -93,12 +99,12 @@ const Scene: React.FC = () => {
   const simState = useStore((state) => state.simState);
   const thetaCmd = useStore((state) => state.thetaCmd);
   const phiCmd = useStore((state) => state.phiCmd);
-  const trajectory = useStore((state) => state.trajectory);
+  // const trajectory = useStore((state) => state.trajectory);
 
   // Convert trajectory to simple x,y points
-  const trajectoryPoints = useMemo(() => {
-    return trajectory.map(p => ({ x: p.x, y: p.y }));
-  }, [trajectory]);
+  // const trajectoryPoints = useMemo(() => {
+  //   return trajectory.map(p => ({ x: p.x, y: p.y }));
+  // }, [trajectory]);
 
   return (
     <>
@@ -139,10 +145,10 @@ const Scene: React.FC = () => {
       <Plate theta={thetaCmd} phi={phiCmd} />
 
       {/* Ball */}
-      <Ball x={simState.x} y={simState.y} />
+      <Ball x={simState.x} y={simState.y} theta={thetaCmd} phi={phiCmd} />
 
-      {/* Trajectory */}
-      <Trajectory points={trajectoryPoints} />
+      {/* Trajectory - Hidden for now as it doesn't follow plate surface */}
+      {/* <Trajectory points={trajectoryPoints} /> */}
 
       {/* OrbitControls */}
       <OrbitControls
