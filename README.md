@@ -149,7 +149,7 @@ npm run preview
   - Kp (Position gain): Controls response to position error
   - Kd (Velocity gain): Controls damping and overshoot
 - **Controller Options**:
-  - Use Feedforward: Enable acceleration feedforward for better tracking
+  - Use Feedforward: Enable acceleration feedforward for better tracking (disabled by default)
   - Small Angle Approximation: Use θ ≈ sin(θ) instead of θ = arcsin(...)
 - **Max Rate**: Angle command rate limit in deg/s
 

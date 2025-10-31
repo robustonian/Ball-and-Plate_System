@@ -90,7 +90,7 @@ export const GAIN_PRESETS = {
 export function createDefaultControllerConfig(): ControllerConfig {
   return {
     gains: createDefaultGains(),
-    useFeedforward: true,
+    useFeedforward: false,
     useSmallAngleApprox: false,
     maxRateDegPerSec: 200,
   };
