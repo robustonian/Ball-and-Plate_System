@@ -24,7 +24,8 @@ This application simulates a ball rolling on a tilting plate, controlled by a PD
 1. **Stabilization Mode**: Maintains the ball at the origin (0, 0)
 2. **Mouse Tracking Mode**: Ball follows your mouse cursor with smooth filtering
 3. **Drawing Path Mode**: Draw a custom path for the ball to follow
-4. **Manual Control Mode**: Direct control using arrow keys
+4. **G-code Path Mode**: Load paths from images or G-code files for precise trajectory control
+5. **Manual Control Mode**: Direct control using arrow keys
 
 ### Real-Time Angle Visualization
 
@@ -160,7 +161,7 @@ npm run preview
 
 #### Display Tab
 
-- **Trail Length**: Number of trajectory points to display (0-1000)
+- **Trail Length**: Number of trajectory points to display (0-5000)
 - **Show Angle Chart**: Toggle real-time angle visualization
 - **Chart History**: Time window for angle chart (5-30 seconds)
 - **Show 3D View**: Toggle 3D floating window
@@ -174,6 +175,37 @@ npm run preview
 4. Click "Finish" to create a spline-interpolated trajectory
 5. Use Play/Pause/Reset to control playback
 6. Enable "Loop" for continuous repetition
+
+### G-code Mode
+
+Load complex paths from images or G-code files for precise trajectory control:
+
+#### Using Images:
+1. Select "G-code Path" from Control Mode dropdown
+2. Click "Upload Image" and select a PNG/JPG file (simple line drawings work best)
+3. Adjust processing parameters:
+   - **Edge Threshold** (50-200): Higher values detect fewer edges
+   - **Point Reduction** (0.1%-5%): Higher values create simpler paths
+4. View path metadata (point count, path length)
+5. Adjust duration (5-60s) and enable loop mode
+6. Use Play/Pause/Reset to control playback
+
+#### Using G-code Files:
+1. Select "G-code Path" from Control Mode dropdown
+2. Click "Upload G-code File" and select a .nc, .gcode, or .txt file
+3. Supported G-code commands:
+   - G00 (rapid move), G01 (linear interpolation)
+   - G90 (absolute coordinates), G91 (relative coordinates)
+   - G20 (inches), G21 (millimeters)
+4. Path automatically scaled to fit plate size
+5. Adjust duration and loop mode as desired
+
+**Features:**
+- Fully client-side processing (no server required)
+- Sobel edge detection for image contour extraction
+- Douglas-Peucker algorithm for path simplification
+- Automatic scaling and centering to plate coordinates
+- Real-time path metadata display
 
 ## Theory
 
@@ -231,7 +263,7 @@ Ball-and-Plate_System/
 │   ├── sim/
 │   │   ├── physics.ts          # Physics simulation (RK4, dynamics)
 │   │   ├── controller.ts       # PD controller with feedforward
-│   │   └── reference.ts        # Reference generators (mouse, drawing)
+│   │   └── reference.ts        # Reference generators (mouse, drawing, gcode)
 │   ├── state/
 │   │   └── store.ts            # Zustand state management
 │   ├── components/
@@ -240,7 +272,8 @@ Ball-and-Plate_System/
 │   │   ├── ThreeView.tsx       # 3D visualization with Three.js
 │   │   └── ControlPanel.tsx    # UI controls
 │   ├── utils/
-│   │   └── math.ts             # Math utilities (filters, splines)
+│   │   ├── math.ts             # Math utilities (filters, splines)
+│   │   └── gcode.ts            # G-code parser and image processing
 │   ├── App.tsx                 # Main application
 │   ├── main.tsx                # Entry point
 │   └── index.css               # Global styles
@@ -306,6 +339,7 @@ Requires support for:
 ## Known Limitations
 
 - Drawing mode uses simplified linear spline (true cubic spline would require additional library)
+- G-code mode image processing works best with simple line drawings; complex images may require parameter adjustment
 - No process/sensor noise simulation in this version
 - Mouse velocity estimation uses simple numerical differentiation
 - Manual control applies additive angles (not separate mode by default)
