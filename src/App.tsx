@@ -90,7 +90,7 @@ const App: React.FC = () => {
 
         case 'KeyM': {
           // Cycle through modes
-          const modes = ['stabilization', 'mouse', 'drawing', 'manual'] as const;
+          const modes = ['stabilization', 'mouse', 'drawing', 'gcode', 'manual'] as const;
           const currentIndex = modes.indexOf(controlMode);
           const nextMode = modes[(currentIndex + 1) % modes.length];
           setControlMode(nextMode);

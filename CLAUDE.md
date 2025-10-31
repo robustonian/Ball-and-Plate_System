@@ -70,7 +70,7 @@ npm run format
 - **Manual input**: Additive angles can be applied in manual mode (arrow keys)
 
 ### Reference Generators (sim/reference.ts)
-Four control modes coordinated by `ReferenceManager`:
+Five control modes coordinated by `ReferenceManager`:
 
 1. **Stabilization**: Always returns origin (0, 0)
 2. **Mouse Tracking**:
@@ -80,7 +80,13 @@ Four control modes coordinated by `ReferenceManager`:
    - User draws points, converted to `CubicSpline2D` (currently linear interpolation between points)
    - Parametric trajectory with adjustable duration and loop mode
    - Evaluates position/velocity/acceleration along spline with chain rule scaling
-4. **Manual**: No automatic reference, user directly controls plate angles via arrow keys
+4. **G-code Path**:
+   - Supports both image-to-path conversion and G-code file loading
+   - Image processing: Sobel edge detection + contour tracing + Douglas-Peucker simplification
+   - G-code parser: Supports G00/G01 commands, absolute/relative coordinates (G90/G91), mm/inch units (G20/G21)
+   - Paths scaled to plate coordinates and converted to `CubicSpline2D` for smooth tracking
+   - Adjustable duration and loop mode (default 15s)
+5. **Manual**: No automatic reference, user directly controls plate angles via arrow keys
    - Arrow keys map intuitively: ↑ moves ball up (positive φ), → moves ball right (positive θ)
 
 ### Math Utilities (utils/math.ts)
@@ -88,6 +94,24 @@ Four control modes coordinated by `ReferenceManager`:
 - **DerivativeEstimator**: Numerical differentiation with low-pass filtering
 - **RateLimiter**: Slew rate limiting for angle commands
 - **CubicSpline2D**: Piecewise path interpolation (simplified implementation using linear segments with arc-length parameterization)
+
+### G-code and Image Processing Utilities (utils/gcode.ts)
+- **Image Processing Pipeline**:
+  - Canvas API for client-side image loading and manipulation
+  - Grayscale conversion (weighted RGB: 0.299R + 0.587G + 0.114B)
+  - Sobel edge detection with configurable threshold (default 128)
+  - Moore-Neighbor contour tracing algorithm
+  - Douglas-Peucker path simplification (configurable tolerance)
+  - Automatic scaling and centering to plate coordinates
+- **G-code Parser**:
+  - Supports G00 (rapid move) and G01 (linear interpolation) commands
+  - Handles G90 (absolute) and G91 (relative) positioning
+  - Unit conversion for G20 (inches) and G21 (millimeters)
+  - Comment stripping (semicolon-delimited)
+  - Automatic path scaling to fit plate size (default 0.4m target)
+- **Path Utilities**:
+  - Path length calculation for trajectory metadata
+  - Coordinate normalization and bounding box computation
 
 ### React Components
 - **CanvasView.tsx**: Renders simulation state using Canvas 2D API with high-DPI support
@@ -132,6 +156,22 @@ Four control modes coordinated by `ReferenceManager`:
 4. Play/pause/loop controls manage trajectory playback
 5. Spline evaluated at `t ∈ [0, 1]` scaled by duration for velocity/acceleration
 
+### G-code Mode Workflow
+1. Select G-code mode from Control Panel
+2. **Image Upload**:
+   - Upload PNG/JPG image file
+   - Adjust edge threshold (50-200, higher = fewer edges detected)
+   - Adjust point reduction (0.1%-5%, higher = fewer points)
+   - Image processed client-side to extract contour path
+3. **G-code File Upload**:
+   - Upload .nc/.gcode/.txt file
+   - Parser extracts coordinates from G00/G01 commands
+   - Automatically handles different units and coordinate modes
+4. Path metadata displayed (source, filename, point count, path length)
+5. Adjust duration (5-60s) and enable/disable loop mode
+6. Play/pause/reset controls manage trajectory playback
+7. Spline evaluated at `t ∈ [0, 1]` scaled by duration for velocity/acceleration
+
 ## Physics Constants
 - Gravity: `g = 9.81 m/s²`
 - Sphere coefficient: `k = (5/7) * g ≈ 7.007 m/s²`
@@ -148,16 +188,20 @@ Four control modes coordinated by `ReferenceManager`:
 
 ### Adding new control modes:
 1. Define mode type in `reference.ts` `ControlMode` union
-2. Implement generator class (follow pattern of `MouseReferenceGenerator`)
+2. Implement generator class (follow pattern of `MouseReferenceGenerator` or `GCodeReferenceGenerator`)
 3. Add to `ReferenceManager.getReference()` switch statement
 4. Update UI in `ControlPanel.tsx` dropdown
+5. Add to mode cycling in `App.tsx` keyboard handler (KeyM)
 
 ### Testing controller behavior:
 - Use aggressive gains to see oscillations/instability
-- Enable feedforward to improve tracking (especially for drawing mode)
+- Enable feedforward to improve tracking (especially for drawing and G-code modes)
 - Small angle approximation is faster but less accurate at large angles
 - Mouse mode demonstrates tracking with velocity/acceleration estimation
+- Drawing mode shows user-created paths with adjustable duration
+- G-code mode allows testing with complex, precise paths from images or CNC files
 - Use angle chart (Display tab) to observe overshoot, settling time, and oscillations
 - Chart shows θ (red), φ (blue), and tracking error (green) with saturation limits marked
 - Use 3D view (Display tab) to visualize plate tilt and ball motion in 3D space
 - Drag to rotate camera, scroll to zoom in 3D view
+- Trail length configurable from 0-5000 points for long trajectory visualization
