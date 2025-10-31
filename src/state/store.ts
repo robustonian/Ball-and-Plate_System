@@ -25,6 +25,13 @@ import {
 } from '../sim/controller';
 import { ReferenceManager, ControlMode } from '../sim/reference';
 import { deg2rad } from '../utils/math';
+import {
+  parseGCodeFile,
+  processImageToPath,
+  calculatePathLength,
+  DEFAULT_IMAGE_OPTIONS,
+  ImageProcessingOptions,
+} from '../utils/gcode';
 
 /**
  * Trajectory point for trail rendering
@@ -94,6 +101,11 @@ interface AppState {
   drawingPath: Array<{ x: number; y: number }>;
   isDrawing: boolean;
 
+  // G-code mode
+  gcodePoints: Array<{ x: number; y: number }>;
+  gcodeMetadata: { source: 'image' | 'file'; name: string; pointCount: number; pathLength: number } | null;
+  gcodeProcessing: boolean;
+
   // Actions
   reset: () => void;
   setInitialPosition: (x: number, y: number) => void;
@@ -126,6 +138,14 @@ interface AppState {
   pauseDrawing: () => void;
   resetDrawing: () => void;
   setDrawingLoop: (loop: boolean) => void;
+  loadGCodeFromFile: (file: File) => Promise<void>;
+  generateGCodeFromImage: (file: File, options?: any) => Promise<void>;
+  playGCode: () => void;
+  pauseGCode: () => void;
+  resetGCode: () => void;
+  setGCodeLoop: (loop: boolean) => void;
+  setGCodeDuration: (duration: number) => void;
+  clearGCode: () => void;
 }
 
 /**
@@ -175,6 +195,9 @@ export const useStore = create<AppState>((set, get) => ({
   mousePhysicalPos: null,
   drawingPath: [],
   isDrawing: false,
+  gcodePoints: [],
+  gcodeMetadata: null,
+  gcodeProcessing: false,
 
   // Actions
   reset: () => {
@@ -482,5 +505,92 @@ export const useStore = create<AppState>((set, get) => ({
   setDrawingLoop: (loop: boolean) => {
     const state = get();
     state.referenceManager.setDrawingLoop(loop);
+  },
+
+  loadGCodeFromFile: async (file: File) => {
+    set({ gcodeProcessing: true });
+
+    try {
+      const points = await parseGCodeFile(file);
+      const pathLength = calculatePathLength(points);
+
+      set({
+        gcodePoints: points,
+        gcodeMetadata: {
+          source: 'file',
+          name: file.name,
+          pointCount: points.length,
+          pathLength,
+        },
+        gcodeProcessing: false,
+      });
+
+      const state = get();
+      state.referenceManager.setGCodePath(points, 15);
+    } catch (error) {
+      console.error('Failed to load G-code file:', error);
+      set({ gcodeProcessing: false });
+      throw error;
+    }
+  },
+
+  generateGCodeFromImage: async (file: File, options?: ImageProcessingOptions) => {
+    set({ gcodeProcessing: true });
+
+    try {
+      const processingOptions = options || DEFAULT_IMAGE_OPTIONS;
+      const points = await processImageToPath(file, processingOptions);
+      const pathLength = calculatePathLength(points);
+
+      set({
+        gcodePoints: points,
+        gcodeMetadata: {
+          source: 'image',
+          name: file.name,
+          pointCount: points.length,
+          pathLength,
+        },
+        gcodeProcessing: false,
+      });
+
+      const state = get();
+      state.referenceManager.setGCodePath(points, 15);
+    } catch (error) {
+      console.error('Failed to generate G-code from image:', error);
+      set({ gcodeProcessing: false });
+      throw error;
+    }
+  },
+
+  playGCode: () => {
+    const state = get();
+    state.referenceManager.playGCode(state.simState.time);
+  },
+
+  pauseGCode: () => {
+    const state = get();
+    state.referenceManager.pauseGCode();
+  },
+
+  resetGCode: () => {
+    const state = get();
+    state.referenceManager.resetGCode();
+  },
+
+  setGCodeLoop: (loop: boolean) => {
+    const state = get();
+    state.referenceManager.setGCodeLoop(loop);
+  },
+
+  setGCodeDuration: (duration: number) => {
+    const state = get();
+    state.referenceManager.setGCodeDuration(duration);
+  },
+
+  clearGCode: () => {
+    set({
+      gcodePoints: [],
+      gcodeMetadata: null,
+    });
   },
 }));

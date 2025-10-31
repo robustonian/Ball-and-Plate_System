@@ -8,7 +8,7 @@ import { Reference } from './controller';
 /**
  * Control mode types
  */
-export type ControlMode = 'stabilization' | 'mouse' | 'drawing' | 'manual';
+export type ControlMode = 'stabilization' | 'mouse' | 'drawing' | 'manual' | 'gcode';
 
 /**
  * Stabilization mode: reference is always at origin
@@ -223,17 +223,146 @@ export class DrawingReferenceGenerator {
 }
 
 /**
+ * G-code mode reference generator
+ * Follows a path loaded from G-code or generated from image
+ */
+export class GCodeReferenceGenerator {
+  private spline: CubicSpline2D | null;
+  private duration: number; // seconds
+  private startTime: number;
+  private isPlaying: boolean;
+  private loop: boolean;
+  private currentT: number;
+
+  constructor() {
+    this.spline = null;
+    this.duration = 15; // default 15 seconds
+    this.startTime = 0;
+    this.isPlaying = false;
+    this.loop = true;
+    this.currentT = 0;
+  }
+
+  /**
+   * Set path from points
+   */
+  setPath(points: Array<{ x: number; y: number }>, duration: number = 15): void {
+    if (points.length < 2) {
+      this.spline = null;
+      return;
+    }
+
+    this.spline = new CubicSpline2D(points);
+    this.duration = duration;
+    this.currentT = 0;
+  }
+
+  /**
+   * Start playback
+   */
+  play(currentTime: number): void {
+    this.isPlaying = true;
+    this.startTime = currentTime - this.currentT * this.duration;
+  }
+
+  /**
+   * Pause playback
+   */
+  pause(): void {
+    this.isPlaying = false;
+  }
+
+  /**
+   * Reset to start
+   */
+  reset(): void {
+    this.currentT = 0;
+    this.isPlaying = false;
+  }
+
+  /**
+   * Set loop mode
+   */
+  setLoop(loop: boolean): void {
+    this.loop = loop;
+  }
+
+  /**
+   * Set duration
+   */
+  setDuration(duration: number): void {
+    this.duration = duration;
+  }
+
+  /**
+   * Update reference
+   */
+  update(time: number): Reference {
+    if (!this.spline || !this.isPlaying) {
+      return createStabilizationReference();
+    }
+
+    // Calculate normalized time parameter
+    const elapsed = time - this.startTime;
+    let t = elapsed / this.duration;
+
+    if (this.loop) {
+      t = t - Math.floor(t); // wrap to [0, 1)
+    } else {
+      t = Math.min(t, 1);
+      if (t >= 1) {
+        this.isPlaying = false;
+      }
+    }
+
+    this.currentT = t;
+
+    // Evaluate spline
+    const pos = this.spline.evaluate(t);
+    const vel = this.spline.evaluateVelocity(t);
+    const acc = this.spline.evaluateAcceleration(t);
+
+    // Scale velocity and acceleration by duration (chain rule)
+    const timeScale = 1 / this.duration;
+    const vel2Scale = timeScale * timeScale;
+
+    return {
+      x: pos.x,
+      y: pos.y,
+      vx: vel.x * timeScale,
+      vy: vel.y * timeScale,
+      ax: acc.x * vel2Scale,
+      ay: acc.y * vel2Scale,
+    };
+  }
+
+  isActive(): boolean {
+    return this.isPlaying && this.spline !== null;
+  }
+
+  hasPath(): boolean {
+    return this.spline !== null;
+  }
+
+  getCurrentProgress(): number {
+    return this.currentT;
+  }
+}
+
+/**
  * Reference manager - coordinates all reference generators
  */
 export class ReferenceManager {
   private mode: ControlMode;
   private mouseGenerator: MouseReferenceGenerator;
   private drawingGenerator: DrawingReferenceGenerator;
+  private gcodeGenerator: GCodeReferenceGenerator;
 
   constructor() {
     this.mode = 'stabilization';
     this.mouseGenerator = new MouseReferenceGenerator();
     this.drawingGenerator = new DrawingReferenceGenerator();
+    this.gcodeGenerator = new GCodeReferenceGenerator();
   }
 
   setMode(mode: ControlMode): void {
@@ -286,6 +415,48 @@ export class ReferenceManager {
   }
 
   /**
+   * Set G-code path
+   */
+  setGCodePath(points: Array<{ x: number; y: number }>, duration?: number): void {
+    this.gcodeGenerator.setPath(points, duration);
+  }
+
+  /**
+   * Control G-code playback
+   */
+  playGCode(currentTime: number): void {
+    this.gcodeGenerator.play(currentTime);
+  }
+
+  pauseGCode(): void {
+    this.gcodeGenerator.pause();
+  }
+
+  resetGCode(): void {
+    this.gcodeGenerator.reset();
+  }
+
+  setGCodeLoop(loop: boolean): void {
+    this.gcodeGenerator.setLoop(loop);
+  }
+
+  setGCodeDuration(duration: number): void {
+    this.gcodeGenerator.setDuration(duration);
+  }
+
+  isGCodeActive(): boolean {
+    return this.gcodeGenerator.isActive();
+  }
+
+  hasGCodePath(): boolean {
+    return this.gcodeGenerator.hasPath();
+  }
+
+  getGCodeProgress(): number {
+    return this.gcodeGenerator.getCurrentProgress();
+  }
+
+  /**
    * Get current reference based on mode
    */
   getReference(time: number, dt: number): Reference {
@@ -298,6 +469,9 @@ export class ReferenceManager {
 
       case 'drawing':
         return this.drawingGenerator.update(time);
+
+      case 'gcode':
+        return this.gcodeGenerator.update(time);
 
       case 'manual':
         // Manual mode: no automatic reference, use stabilization as base
@@ -314,5 +488,6 @@ export class ReferenceManager {
   reset(): void {
     this.mouseGenerator.reset();
     this.drawingGenerator.reset();
+    this.gcodeGenerator.reset();
   }
 }

@@ -10,6 +10,12 @@ import { PHYSICS_CONSTANTS } from '../sim/physics';
 
 const ControlPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'control' | 'physics' | 'display'>('control');
+  const [gcodeDuration, setGcodeDurationLocal] = useState(15);
+  const [imageOptions, setImageOptions] = useState({
+    edgeThreshold: 128,
+    pointReduction: 0.01,
+    targetSize: 0.4,
+  });
 
   // State
   const simState = useStore((state) => state.simState);
@@ -55,6 +61,16 @@ const ControlPanel: React.FC = () => {
   const resetDrawing = useStore((state) => state.resetDrawing);
   const setDrawingLoop = useStore((state) => state.setDrawingLoop);
   const isDrawing = useStore((state) => state.isDrawing);
+  const gcodeMetadata = useStore((state) => state.gcodeMetadata);
+  const gcodeProcessing = useStore((state) => state.gcodeProcessing);
+  const loadGCodeFromFile = useStore((state) => state.loadGCodeFromFile);
+  const generateGCodeFromImage = useStore((state) => state.generateGCodeFromImage);
+  const playGCode = useStore((state) => state.playGCode);
+  const pauseGCode = useStore((state) => state.pauseGCode);
+  const resetGCode = useStore((state) => state.resetGCode);
+  const setGCodeLoop = useStore((state) => state.setGCodeLoop);
+  const setGCodeDuration = useStore((state) => state.setGCodeDuration);
+  const clearGCode = useStore((state) => state.clearGCode);
 
   // Computed values
   const errorMagnitude = Math.sqrt(
@@ -62,6 +78,38 @@ const ControlPanel: React.FC = () => {
   );
 
   const thetaMaxDeg = rad2deg(physicsParams.thetaMax);
+
+  // File upload handlers
+  const handleGCodeFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await loadGCodeFromFile(file);
+    } catch (error) {
+      alert(`Failed to load G-code file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    e.target.value = ''; // Reset input
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await generateGCodeFromImage(file, imageOptions);
+    } catch (error) {
+      alert(`Failed to process image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    e.target.value = ''; // Reset input
+  };
+
+  const handleGCodeDurationChange = (newDuration: number) => {
+    setGcodeDurationLocal(newDuration);
+    setGCodeDuration(newDuration);
+  };
 
   return (
     <div className="flex flex-col h-full bg-gray-900 text-white overflow-y-auto">
@@ -178,13 +226,14 @@ const ControlPanel: React.FC = () => {
               <select
                 value={controlMode}
                 onChange={(e) =>
-                  setControlMode(e.target.value as 'stabilization' | 'mouse' | 'drawing' | 'manual')
+                  setControlMode(e.target.value as 'stabilization' | 'mouse' | 'drawing' | 'manual' | 'gcode')
                 }
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-white"
               >
                 <option value="stabilization">Stabilization (Origin)</option>
                 <option value="mouse">Mouse Tracking</option>
                 <option value="drawing">Drawing Path</option>
+                <option value="gcode">G-code Path</option>
                 <option value="manual">Manual Control</option>
               </select>
             </div>
@@ -258,6 +307,154 @@ const ControlPanel: React.FC = () => {
                         type="checkbox"
                         defaultChecked
                         onChange={(e) => setDrawingLoop(e.target.checked)}
+                        className="mr-2"
+                      />
+                      Loop
+                    </label>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* G-code controls */}
+            {controlMode === 'gcode' && (
+              <div className="bg-gray-800 p-3 rounded space-y-3">
+                <h3 className="text-sm font-semibold">G-code Mode</h3>
+
+                {gcodeProcessing && (
+                  <div className="text-sm text-blue-400">Processing file...</div>
+                )}
+
+                {!gcodeMetadata && !gcodeProcessing && (
+                  <div className="space-y-2">
+                    <div>
+                      <label className="block text-xs font-semibold mb-2">Upload Image</label>
+                      <input
+                        type="file"
+                        accept=".png,.jpg,.jpeg"
+                        onChange={handleImageUpload}
+                        className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                      />
+                    </div>
+
+                    <div className="border-t border-gray-700 pt-2">
+                      <label className="block text-xs font-semibold mb-2">Upload G-code File</label>
+                      <input
+                        type="file"
+                        accept=".nc,.gcode,.txt"
+                        onChange={handleGCodeFileUpload}
+                        className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700"
+                      />
+                    </div>
+
+                    <div className="border-t border-gray-700 pt-2">
+                      <label className="block text-xs text-gray-400 mb-1">
+                        Image Edge Threshold: {imageOptions.edgeThreshold}
+                      </label>
+                      <input
+                        type="range"
+                        min="50"
+                        max="200"
+                        step="10"
+                        value={imageOptions.edgeThreshold}
+                        onChange={(e) =>
+                          setImageOptions({ ...imageOptions, edgeThreshold: parseInt(e.target.value) })
+                        }
+                        className="w-full"
+                      />
+
+                      <label className="block text-xs text-gray-400 mb-1 mt-2">
+                        Point Reduction: {(imageOptions.pointReduction * 100).toFixed(1)}%
+                      </label>
+                      <input
+                        type="range"
+                        min="0.001"
+                        max="0.05"
+                        step="0.001"
+                        value={imageOptions.pointReduction}
+                        onChange={(e) =>
+                          setImageOptions({ ...imageOptions, pointReduction: parseFloat(e.target.value) })
+                        }
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {gcodeMetadata && !gcodeProcessing && (
+                  <div className="space-y-2">
+                    <div className="bg-gray-700 p-2 rounded text-xs space-y-1">
+                      <div>
+                        <span className="text-gray-400">Source:</span>{' '}
+                        <span className="font-mono">{gcodeMetadata.source}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">File:</span>{' '}
+                        <span className="font-mono">{gcodeMetadata.name}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Points:</span>{' '}
+                        <span className="font-mono">{gcodeMetadata.pointCount}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Path Length:</span>{' '}
+                        <span className="font-mono">{(gcodeMetadata.pathLength * 1000).toFixed(1)} mm</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">
+                        Duration: {gcodeDuration}s
+                      </label>
+                      <input
+                        type="range"
+                        min="5"
+                        max="60"
+                        step="1"
+                        value={gcodeDuration}
+                        onChange={(e) => handleGCodeDurationChange(parseInt(e.target.value))}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      {!referenceManager.isGCodeActive() ? (
+                        <button
+                          onClick={playGCode}
+                          className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 rounded text-sm"
+                        >
+                          Play
+                        </button>
+                      ) : (
+                        <button
+                          onClick={pauseGCode}
+                          className="flex-1 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 rounded text-sm"
+                        >
+                          Pause
+                        </button>
+                      )}
+                      <button
+                        onClick={resetGCode}
+                        className="flex-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded text-sm"
+                      >
+                        Reset
+                      </button>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={clearGCode}
+                        className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-sm"
+                      >
+                        Clear Path
+                      </button>
+                    </div>
+
+                    <label className="flex items-center text-sm">
+                      <input
+                        type="checkbox"
+                        defaultChecked
+                        onChange={(e) => setGCodeLoop(e.target.checked)}
                         className="mr-2"
                       />
                       Loop
@@ -495,8 +692,8 @@ const ControlPanel: React.FC = () => {
               <input
                 type="range"
                 min="0"
-                max="1000"
-                step="50"
+                max="5000"
+                step="100"
                 value={maxTrailLength}
                 onChange={(e) => setMaxTrailLength(parseInt(e.target.value))}
                 className="w-full"
