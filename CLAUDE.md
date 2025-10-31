@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 An interactive web-based simulator for a ball-and-plate control system demonstrating control theory concepts. The system models a ball rolling on a tilting plate controlled by a PD controller with optional feedforward. Built with TypeScript, React, Vite, Zustand, and Tailwind CSS.
 
+**🎃 Features a Halloween theme** (default) with jack-o-lantern ball, spooky atmosphere, particle effects, and theme toggle in Display tab.
+
 ## Development Commands
 
 ### Basic Commands
@@ -48,6 +50,7 @@ npm run format
 - Key state divisions:
   - `simState`: Ball position/velocity (x, y, vx, vy, time)
   - `physicsParams`: Angle saturation, drag settings
+  - `theme`: Current theme ('default' | 'halloween')
   - `controllerConfig`: Gains (Kp, Kd), feedforward/approximation flags
   - `controllerState`: Current angles + rate limiters
   - `referenceManager`: Orchestrates reference generators based on mode

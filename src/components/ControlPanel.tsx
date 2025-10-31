@@ -33,6 +33,7 @@ const ControlPanel: React.FC = () => {
   const threeViewSize = useStore((state) => state.threeViewSize);
   const controlMode = useStore((state) => state.referenceManager.getMode());
   const referenceManager = useStore((state) => state.referenceManager);
+  const theme = useStore((state) => state.theme);
 
   // Actions
   const togglePlayPause = useStore((state) => state.togglePlayPause);
@@ -71,6 +72,7 @@ const ControlPanel: React.FC = () => {
   const setGCodeLoop = useStore((state) => state.setGCodeLoop);
   const setGCodeDuration = useStore((state) => state.setGCodeDuration);
   const clearGCode = useStore((state) => state.clearGCode);
+  const toggleTheme = useStore((state) => state.toggleTheme);
 
   // Computed values
   const errorMagnitude = Math.sqrt(
@@ -111,76 +113,99 @@ const ControlPanel: React.FC = () => {
     setGCodeDuration(newDuration);
   };
 
+  const isHalloween = theme === 'halloween';
+
+  // Theme-aware colors
+  const bgColor = isHalloween ? 'bg-spooky-700' : 'bg-gray-900';
+  const bgAlt = isHalloween ? 'bg-spooky-600' : 'bg-gray-800';
+  const borderColor = isHalloween ? 'border-pumpkin-600' : 'border-gray-700';
+  const textMuted = isHalloween ? 'text-pumpkin-200' : 'text-gray-400';
+  const btnPrimary = isHalloween ? 'bg-pumpkin-600 hover:bg-pumpkin-700' : 'bg-green-600 hover:bg-green-700';
+  const btnSecondary = isHalloween ? 'bg-spooky-500 hover:bg-spooky-400' : 'bg-red-600 hover:bg-red-700';
+  const btnInfo = isHalloween ? 'bg-spooky-400 hover:bg-spooky-500 border border-pumpkin-500' : 'bg-blue-600 hover:bg-blue-700';
+
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-white overflow-y-auto">
+    <div className={`flex flex-col h-full ${bgColor} text-white overflow-y-auto`}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-700">
-        <h1 className="text-2xl font-bold mb-2">Ball & Plate System</h1>
-        <p className="text-sm text-gray-400">Control and Monitor</p>
+      <div className={`p-4 border-b ${borderColor}`}>
+        <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
+          {isHalloween && <span>🎃</span>}
+          Ball & Plate System
+          {isHalloween && <span>🎃</span>}
+        </h1>
+        <p className={`text-sm ${textMuted}`}>
+          {isHalloween ? '🦇 Spooky Control & Monitor 👻' : 'Control and Monitor'}
+        </p>
       </div>
 
       {/* Status Display */}
-      <div className="p-4 bg-gray-800 border-b border-gray-700">
-        <h2 className="text-sm font-semibold mb-2 text-gray-300">Status</h2>
+      <div className={`p-4 ${bgAlt} border-b ${borderColor}`}>
+        <h2 className={`text-sm font-semibold mb-2 ${textMuted}`}>
+          {isHalloween && '👁️ '}Status{isHalloween && ' 👁️'}
+        </h2>
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div>
-            <span className="text-gray-400">Position:</span>{' '}
-            <span className="font-mono">
+            <span className={textMuted}>Position:</span>{' '}
+            <span className={`font-mono ${isHalloween ? 'text-eerie-400' : ''}`}>
               ({simState.x.toFixed(3)}, {simState.y.toFixed(3)}) m
             </span>
           </div>
           <div>
-            <span className="text-gray-400">Velocity:</span>{' '}
-            <span className="font-mono">
+            <span className={textMuted}>Velocity:</span>{' '}
+            <span className={`font-mono ${isHalloween ? 'text-eerie-400' : ''}`}>
               ({simState.vx.toFixed(3)}, {simState.vy.toFixed(3)}) m/s
             </span>
           </div>
           <div>
-            <span className="text-gray-400">Angles:</span>{' '}
-            <span className="font-mono">
+            <span className={textMuted}>Angles:</span>{' '}
+            <span className={`font-mono ${isHalloween ? 'text-pumpkin-400' : ''}`}>
               θ={rad2deg(thetaCmd).toFixed(1)}°, φ={rad2deg(phiCmd).toFixed(1)}°
             </span>
           </div>
           <div>
-            <span className="text-gray-400">Error:</span>{' '}
-            <span className="font-mono">{(errorMagnitude * 1000).toFixed(1)} mm</span>
+            <span className={textMuted}>Error:</span>{' '}
+            <span className={`font-mono ${isHalloween ? 'text-spooky-300' : ''}`}>
+              {(errorMagnitude * 1000).toFixed(1)} mm
+            </span>
           </div>
           <div className="col-span-2">
-            <span className="text-gray-400">Time:</span>{' '}
+            <span className={textMuted}>Time:</span>{' '}
             <span className="font-mono">{simState.time.toFixed(2)} s</span>
           </div>
         </div>
       </div>
 
       {/* Simulation Controls */}
-      <div className="p-4 border-b border-gray-700">
-        <h2 className="text-sm font-semibold mb-3 text-gray-300">Simulation</h2>
+      <div className={`p-4 border-b ${borderColor}`}>
+        <h2 className={`text-sm font-semibold mb-3 ${textMuted}`}>
+          {isHalloween && '⚡ '}Simulation{isHalloween && ' ⚡'}
+        </h2>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={togglePlayPause}
             className={`px-4 py-2 rounded font-medium ${
               isRunning
-                ? 'bg-yellow-600 hover:bg-yellow-700'
-                : 'bg-green-600 hover:bg-green-700'
+                ? (isHalloween ? 'bg-pumpkin-500 hover:bg-pumpkin-600' : 'bg-yellow-600 hover:bg-yellow-700')
+                : btnPrimary
             }`}
           >
-            {isRunning ? 'Pause' : 'Play'}
+            {isRunning ? (isHalloween ? '⏸️ Pause' : 'Pause') : (isHalloween ? '▶️ Play' : 'Play')}
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 rounded font-medium bg-red-600 hover:bg-red-700"
+            className={`px-4 py-2 rounded font-medium ${btnSecondary}`}
           >
-            Reset
+            {isHalloween ? '🔄 Reset' : 'Reset'}
           </button>
           <button
             onClick={startInitPositionMode}
-            className="px-4 py-2 rounded font-medium bg-blue-600 hover:bg-blue-700"
+            className={`px-4 py-2 rounded font-medium ${btnInfo}`}
           >
-            Set Initial Position
+            {isHalloween ? '📍 Set Position' : 'Set Initial Position'}
           </button>
         </div>
         <div className="mt-3">
-          <label className="block text-xs text-gray-400 mb-1">Time Scale</label>
+          <label className={`block text-xs ${textMuted} mb-1`}>Time Scale</label>
           <div className="flex gap-2">
             {[0.25, 0.5, 1, 2].map((scale) => (
               <button
@@ -188,8 +213,8 @@ const ControlPanel: React.FC = () => {
                 onClick={() => setTimeScale(scale)}
                 className={`px-3 py-1 rounded text-sm ${
                   timeScale === scale
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    ? (isHalloween ? 'bg-pumpkin-600 text-white' : 'bg-blue-600 text-white')
+                    : (isHalloween ? 'bg-spooky-500 text-pumpkin-200 hover:bg-spooky-400' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')
                 }`}
               >
                 {scale}x
@@ -200,20 +225,28 @@ const ControlPanel: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-700">
-        {(['control', 'physics', 'display'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 px-4 py-2 text-sm font-medium ${
-              activeTab === tab
-                ? 'bg-gray-800 text-white border-b-2 border-blue-500'
-                : 'text-gray-400 hover:text-white hover:bg-gray-800'
-            }`}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
+      <div className={`flex border-b ${borderColor}`}>
+        {(['control', 'physics', 'display'] as const).map((tab) => {
+          const tabIcons = {
+            control: isHalloween ? '🎮' : '',
+            physics: isHalloween ? '🔮' : '',
+            display: isHalloween ? '👀' : '',
+          };
+
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 px-4 py-2 text-sm font-medium ${
+                activeTab === tab
+                  ? (isHalloween ? `${bgAlt} text-pumpkin-400 border-b-2 border-pumpkin-500` : 'bg-gray-800 text-white border-b-2 border-blue-500')
+                  : (isHalloween ? 'text-spooky-300 hover:text-pumpkin-300 hover:bg-spooky-600' : 'text-gray-400 hover:text-white hover:bg-gray-800')
+              }`}
+            >
+              {tabIcons[tab]} {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab Content */}
@@ -684,9 +717,31 @@ const ControlPanel: React.FC = () => {
 
         {activeTab === 'display' && (
           <div className="p-4 space-y-4">
+            {/* Theme Toggle */}
+            <div className={`space-y-3 p-3 rounded ${isHalloween ? 'bg-spooky-600 border-2 border-pumpkin-500' : 'bg-gray-800'}`}>
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                {isHalloween ? '🎃' : '🎨'} Theme
+              </h3>
+              <button
+                onClick={toggleTheme}
+                className={`w-full px-4 py-3 rounded font-medium text-sm transition-all ${
+                  isHalloween
+                    ? 'bg-pumpkin-600 hover:bg-pumpkin-700 text-white shadow-glow-pumpkin'
+                    : 'bg-gray-700 hover:bg-gray-600 text-white'
+                }`}
+              >
+                {isHalloween ? '🎃 Halloween Mode ON 🦇' : 'Switch to Halloween Theme 🎃'}
+              </button>
+              {isHalloween && (
+                <p className="text-xs text-pumpkin-200 text-center">
+                  👻 Spooky mode activated! 🕸️
+                </p>
+              )}
+            </div>
+
             {/* Trail Length */}
             <div>
-              <label className="block text-xs text-gray-400 mb-1">
+              <label className={`block text-xs ${textMuted} mb-1`}>
                 Trail Length: {maxTrailLength}
               </label>
               <input
@@ -701,8 +756,10 @@ const ControlPanel: React.FC = () => {
             </div>
 
             {/* Angle Chart Settings */}
-            <div className="space-y-3 pt-2 border-t border-gray-700">
-              <h3 className="text-sm font-semibold">Angle Chart</h3>
+            <div className={`space-y-3 pt-2 border-t ${borderColor}`}>
+              <h3 className="text-sm font-semibold">
+                {isHalloween && '📊 '}Angle Chart
+              </h3>
 
               <label className="flex items-center text-sm">
                 <input
@@ -716,7 +773,7 @@ const ControlPanel: React.FC = () => {
 
               {showAngleChart && (
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1">
+                  <label className={`block text-xs ${textMuted} mb-1`}>
                     Chart History (seconds): {maxAngleHistorySeconds}
                   </label>
                   <input
@@ -733,8 +790,10 @@ const ControlPanel: React.FC = () => {
             </div>
 
             {/* 3D View Settings */}
-            <div className="space-y-3 pt-2 border-t border-gray-700">
-              <h3 className="text-sm font-semibold">3D View</h3>
+            <div className={`space-y-3 pt-2 border-t ${borderColor}`}>
+              <h3 className="text-sm font-semibold">
+                {isHalloween && '🎭 '}3D View
+              </h3>
 
               <label className="flex items-center text-sm">
                 <input
@@ -748,7 +807,7 @@ const ControlPanel: React.FC = () => {
 
               {showThreeView && (
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1">
+                  <label className={`block text-xs ${textMuted} mb-1`}>
                     Window Size (pixels): {threeViewSize}
                   </label>
                   <input
@@ -760,7 +819,7 @@ const ControlPanel: React.FC = () => {
                     onChange={(e) => setThreeViewSize(parseInt(e.target.value))}
                     className="w-full"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className={`text-xs ${textMuted} mt-1`}>
                     Drag to rotate • Scroll to zoom
                   </p>
                 </div>
@@ -768,7 +827,7 @@ const ControlPanel: React.FC = () => {
             </div>
 
             {/* Info */}
-            <div className="text-xs text-gray-400 space-y-1">
+            <div className={`text-xs ${textMuted} space-y-1`}>
               <p>Angle chart shows θ (red), φ (blue), and error (green) over time</p>
               <p>3D view displays plate tilt, ball position, and trajectory in 3D space</p>
             </div>
@@ -777,23 +836,25 @@ const ControlPanel: React.FC = () => {
       </div>
 
       {/* Keyboard Shortcuts */}
-      <div className="p-4 bg-gray-800 border-t border-gray-700 text-xs text-gray-400">
-        <p className="font-semibold mb-1">Keyboard Shortcuts</p>
+      <div className={`p-4 ${bgAlt} border-t ${borderColor} text-xs ${textMuted}`}>
+        <p className="font-semibold mb-1">
+          {isHalloween && '⌨️ '}Keyboard Shortcuts
+        </p>
         <div className="space-y-0.5">
           <p>
-            <kbd className="px-1 bg-gray-700 rounded">Space</kbd> - Play/Pause
+            <kbd className={`px-1 rounded ${isHalloween ? 'bg-spooky-500' : 'bg-gray-700'}`}>Space</kbd> - Play/Pause
           </p>
           <p>
-            <kbd className="px-1 bg-gray-700 rounded">R</kbd> - Reset
+            <kbd className={`px-1 rounded ${isHalloween ? 'bg-spooky-500' : 'bg-gray-700'}`}>R</kbd> - Reset
           </p>
           <p>
-            <kbd className="px-1 bg-gray-700 rounded">I</kbd> - Set Initial Position
+            <kbd className={`px-1 rounded ${isHalloween ? 'bg-spooky-500' : 'bg-gray-700'}`}>I</kbd> - Set Initial Position
           </p>
           <p>
-            <kbd className="px-1 bg-gray-700 rounded">M</kbd> - Cycle Mode
+            <kbd className={`px-1 rounded ${isHalloween ? 'bg-spooky-500' : 'bg-gray-700'}`}>M</kbd> - Cycle Mode
           </p>
           <p>
-            <kbd className="px-1 bg-gray-700 rounded">↑↓←→</kbd> - Manual Control
+            <kbd className={`px-1 rounded ${isHalloween ? 'bg-spooky-500' : 'bg-gray-700'}`}>↑↓←→</kbd> - Manual Control
           </p>
         </div>
       </div>

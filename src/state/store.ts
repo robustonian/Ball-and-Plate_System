@@ -53,6 +53,11 @@ interface AngleHistoryPoint {
 }
 
 /**
+ * Theme type
+ */
+export type Theme = 'default' | 'halloween';
+
+/**
  * Application state
  */
 interface AppState {
@@ -92,6 +97,9 @@ interface AppState {
   // 3D view settings
   showThreeView: boolean;
   threeViewSize: number; // pixels
+
+  // Theme
+  theme: Theme;
 
   // UI state
   waitingForInitClick: boolean;
@@ -146,6 +154,8 @@ interface AppState {
   setGCodeLoop: (loop: boolean) => void;
   setGCodeDuration: (duration: number) => void;
   clearGCode: () => void;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
 }
 
 /**
@@ -191,6 +201,7 @@ export const useStore = create<AppState>((set, get) => ({
   showAngleChart: true,
   showThreeView: true,
   threeViewSize: 250,
+  theme: 'halloween',
   waitingForInitClick: false,
   mousePhysicalPos: null,
   drawingPath: [],
@@ -592,5 +603,15 @@ export const useStore = create<AppState>((set, get) => ({
       gcodePoints: [],
       gcodeMetadata: null,
     });
+  },
+
+  setTheme: (theme: Theme) => {
+    set({ theme });
+  },
+
+  toggleTheme: () => {
+    set((state) => ({
+      theme: state.theme === 'default' ? 'halloween' : 'default',
+    }));
   },
 }));

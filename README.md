@@ -19,6 +19,14 @@ This application simulates a ball rolling on a tilting plate, controlled by a PD
 
 ## Features
 
+### 🎃 Halloween Theme
+
+The simulator features a **spooky Halloween theme** (enabled by default) with:
+- **Jack-o-lantern ball**: Glowing orange pumpkin with carved face
+- **Spooky atmosphere**: Purple backgrounds, spider web patterns, floating bats and ghosts
+- **Magical effects**: Glowing trails, particle animations, and atmospheric lighting
+- **Theme toggle**: Switch between Halloween and default themes in the Display tab
+
 ### Control Modes
 
 1. **Stabilization Mode**: Maintains the ball at the origin (0, 0)
@@ -161,6 +169,7 @@ npm run preview
 
 #### Display Tab
 
+- **Theme**: Toggle between Halloween 🎃 and default themes
 - **Trail Length**: Number of trajectory points to display (0-5000)
 - **Show Angle Chart**: Toggle real-time angle visualization
 - **Chart History**: Time window for angle chart (5-30 seconds)

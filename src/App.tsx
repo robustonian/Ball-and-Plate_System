@@ -27,6 +27,7 @@ const App: React.FC = () => {
   const showAngleChart = useStore((state) => state.showAngleChart);
   const showThreeView = useStore((state) => state.showThreeView);
   const threeViewSize = useStore((state) => state.threeViewSize);
+  const theme = useStore((state) => state.theme);
 
   /**
    * Animation loop
@@ -214,20 +215,28 @@ const App: React.FC = () => {
     };
   }, [handleKeyDown]);
 
+  const isHalloween = theme === 'halloween';
+
+  // Theme-aware colors
+  const bgMain = isHalloween ? 'bg-gradient-to-br from-spooky-700 via-midnight-600 to-spooky-800' : 'bg-gray-900';
+  const bgCanvas = isHalloween ? 'bg-spooky-600' : 'bg-gray-800';
+  const borderColor = isHalloween ? 'border-pumpkin-600' : 'border-gray-700';
+  const shadowClass = isHalloween ? 'shadow-glow-pumpkin' : 'shadow-2xl';
+
   return (
-    <div className="flex h-screen w-screen bg-gray-900 text-white relative">
+    <div className={`flex h-screen w-screen ${bgMain} text-white relative`}>
       {/* Main content area */}
       <div className="flex-1 flex flex-col p-4 gap-4">
         {/* Canvas View */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-full h-full max-w-4xl max-h-[600px] bg-gray-800 rounded-lg overflow-hidden shadow-2xl">
+          <div className={`w-full h-full max-w-4xl max-h-[600px] ${bgCanvas} rounded-lg overflow-hidden ${shadowClass} ${isHalloween ? 'border-2 border-pumpkin-500' : ''}`}>
             <CanvasView />
           </div>
         </div>
 
         {/* Angle Chart */}
         {showAngleChart && (
-          <div className="w-full bg-gray-800 rounded-lg overflow-hidden shadow-2xl" style={{ height: '180px' }}>
+          <div className={`w-full ${bgCanvas} rounded-lg overflow-hidden ${shadowClass} ${isHalloween ? 'border-2 border-pumpkin-500' : ''}`} style={{ height: '180px' }}>
             <ChartView />
           </div>
         )}
@@ -236,7 +245,7 @@ const App: React.FC = () => {
       {/* 3D View - Floating Window */}
       {showThreeView && (
         <div
-          className="absolute top-4 right-[25rem] bg-gray-800 border-2 border-gray-700 rounded-lg shadow-2xl overflow-hidden"
+          className={`absolute top-4 right-[25rem] ${bgCanvas} border-2 ${borderColor} rounded-lg ${shadowClass} overflow-hidden ${isHalloween ? 'border-eerie-500' : ''}`}
           style={{
             width: `${threeViewSize}px`,
             height: `${threeViewSize}px`,
@@ -245,15 +254,15 @@ const App: React.FC = () => {
           <div className="relative w-full h-full">
             <ThreeView />
             {/* Label */}
-            <div className="absolute top-2 left-2 bg-gray-900 bg-opacity-80 px-2 py-1 rounded text-xs font-semibold text-gray-300 pointer-events-none">
-              3D View
+            <div className={`absolute top-2 left-2 ${isHalloween ? 'bg-spooky-700' : 'bg-gray-900'} bg-opacity-80 px-2 py-1 rounded text-xs font-semibold ${isHalloween ? 'text-pumpkin-400' : 'text-gray-300'} pointer-events-none`}>
+              {isHalloween && '🎃 '}3D View
             </div>
           </div>
         </div>
       )}
 
       {/* Control Panel */}
-      <div className="w-96 flex-shrink-0 border-l border-gray-700 shadow-xl">
+      <div className={`w-96 flex-shrink-0 border-l ${borderColor} ${shadowClass}`}>
         <ControlPanel />
       </div>
     </div>
